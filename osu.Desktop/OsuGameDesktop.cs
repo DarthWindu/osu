@@ -23,10 +23,7 @@ namespace osu.Desktop
         private readonly bool noVersionOverlay;
 
         public OsuGameDesktop(string[] args = null)
-            : base(args)
-        {
-            noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
-        }
+            : base(args) => noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
 
         public override Storage GetStorageForStableInstall()
         {
