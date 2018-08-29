@@ -22,6 +22,7 @@ namespace osu.Desktop
     {
         private readonly bool noVersionOverlay;
 
+        // TODO : make this easier to read
         public OsuGameDesktop(string[] args = null)
             : base(args) => noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
 
@@ -43,10 +44,11 @@ namespace osu.Desktop
 
             if (!noVersionOverlay)
             {
-                LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
+                // NOTE : renamed v -> view | this is a guess. idk what 'v' is.
+                LoadComponentAsync(new VersionManager { Depth = int.MinValue }, view =>
                 {
-                    Add(v);
-                    v.State = Visibility.Visible;
+                    Add(view);
+                    view.State = Visibility.Visible;
                 });
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
@@ -62,22 +64,23 @@ namespace osu.Desktop
             var desktopWindow = host.Window as DesktopGameWindow;
             if (desktopWindow != null)
             {
-                desktopWindow.CursorState |= CursorState.Hidden;
+                desktopWindow.CursorState |= CursorState.Hidden; // OR Assignment operator
 
-                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico")); // load strings from external config file
                 desktopWindow.Title = Name;
 
                 desktopWindow.FileDrop += fileDrop;
             }
         }
 
-        private void fileDrop(object sender, FileDropEventArgs e)
+        private void fileDrop(object sender, FileDropEventArgs eventArgs)
         {
-            var filePaths = new[] { e.FileName };
+            var filePaths = new[] { eventArgs.FileName };
 
             var firstExtension = Path.GetExtension(filePaths.First());
 
-            if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
+            // NOTE : guess --> renamed f to file
+            if (filePaths.Any(file => Path.GetExtension(file) != firstExtension)) return;
 
             Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
         }
@@ -89,7 +92,10 @@ namespace osu.Desktop
         {
             protected override string LocateBasePath()
             {
-                bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+                // Note : guess: renamed p to thisPath
+                // I believe this (i.e. checkExists() ) is checking for the existence of install files.
+                // I don't this the check HAS to be music. It just has to be a directory that would only be present in the install directory.
+                bool checkExists(string thisPath) => Directory.Exists(Path.Combine(thisPath, "Songs"));
 
                 string stableInstallPath;
 
@@ -103,6 +109,7 @@ namespace osu.Desktop
                 }
                 catch
                 {
+                    // Empty catch is bad
                 }
 
                 stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
@@ -113,12 +120,13 @@ namespace osu.Desktop
                 if (checkExists(stableInstallPath))
                     return stableInstallPath;
 
-                return null;
+                return null; // Low Priority : remove dependence on nulls. Maybe?
             }
 
             public StableStorage()
                 : base(string.Empty, null)
             {
+                // Empty body????
             }
         }
     }
