@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.HitObjects = HitObjects.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
+            connectionLayer.HitObjects = HitObjectContainer.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
@@ -72,7 +72,8 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
+                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale * 1.65f)
             };
 
             judgementLayer.Add(explosion);
